@@ -320,8 +320,7 @@ const server = http.listen(3003, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "https://next-js-socket-io-chatting-app.vercel.app/",
-    credentials: true
+    origin: ["http://localhost:3000", "https://next-js-socket-io-chatting-app.vercel.app/"],
   },
 });
 
