@@ -335,7 +335,6 @@ io.on('connection', (socket) => {
   // Handle join room event
   socket.on('joinRoom', (roomId, roomName, username) => {
     if (username) {
-      console.log('joined: ', roomId, username)
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           if (room.attendees.indexOf(username) <= -1) {
@@ -369,7 +368,6 @@ io.on('connection', (socket) => {
 
   socket.on('leaveRoom', (roomId, username) => {
     if (username) {
-      console.log('leave: ', roomId, username)
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           room.attendees.splice(room.attendees.indexOf(username), 1)
@@ -391,7 +389,6 @@ io.on('connection', (socket) => {
       })
     }
     if (username) {
-      console.log('unsubscribeRoom: ', roomId, username)
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           room.members.splice(room.members.indexOf(username), 1)
@@ -423,13 +420,11 @@ io.on('connection', (socket) => {
         })
       }
     }
-    console.log('rooms: ', isTyping, '-->>', roomId, rooms.filter(room => room.id === roomId))
     io.to(roomId).emit('userTying', rooms);
   });
 
   // Handle chat message event
   socket.on('chatMessage', ({ roomId, message, username }) => {
-    console.log('message: ', message)
     const time = Date.now()
     messages = messages.map((room) => {
       if (room.roomId === roomId) {
