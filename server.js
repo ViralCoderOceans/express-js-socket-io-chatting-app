@@ -8,46 +8,6 @@ const { instrument } = require("@socket.io/admin-ui");
 app.use(cors());
 let rooms = [
   {
-    id: 'test-room-1',
-    name: 'Test Room 1',
-    members: [],
-    attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
-    typingUsers: []
-  },
-  {
-    id: 'test-room-2',
-    name: 'Test Room 2',
-    members: [],
-    attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
-    typingUsers: []
-  },
-  {
-    id: 'test-room-3',
-    name: 'Test Room 3',
-    members: [],
-    attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
-    typingUsers: []
-  },
-  {
-    id: 'test-room-4',
-    name: 'Test Room 4',
-    members: ['user-b7c2'],
-    attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
-    typingUsers: []
-  },
-  {
-    id: 'test-room-5',
-    name: 'Test Room 5',
-    members: [],
-    attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
-    typingUsers: []
-  },
-  {
     id: '12',
     name: 'Test Room 6',
     members: ['user-b7c2'],
@@ -61,41 +21,6 @@ let rooms = [
   }
 ];
 let messages = [
-  {
-    roomId: 'test-room-1',
-    chat: [
-      { username: "Test User 1", message: "hello", time: 1706767172000 },
-      { username: "Test User 2", message: "Hii", time: 1706767172000 }
-    ]
-  },
-  {
-    roomId: 'test-room-2',
-    chat: [
-      { username: "Test User 1", message: "hello", time: 1706767172000 },
-      { username: "Test User 2", message: "Hii", time: 1706767172000 }
-    ]
-  },
-  {
-    roomId: 'test-room-3',
-    chat: [
-      { username: "Test User 1", message: "hello", time: 1706767172000 },
-      { username: "Test User 2", message: "Hii", time: 1706767172000 }
-    ]
-  },
-  {
-    roomId: 'test-room-4',
-    chat: [
-      { username: "Test User 1", message: "hello", time: 1706767172000 },
-      { username: "Test User 2", message: "Hii", time: 1706767172000 }
-    ]
-  },
-  {
-    roomId: 'test-room-5',
-    chat: [
-      { username: "Test User 1", message: "hello", time: 1706767172000 },
-      { username: "Test User 2", message: "Hii", time: 1706767172000 }
-    ]
-  },
   {
     roomId: "12",
     chat: [
@@ -351,7 +276,7 @@ io.on('connection', (socket) => {
     if (rooms.filter((room) => room.id === roomId).length === 0) {
       rooms.push({
         id: roomId,
-        name: roomName,
+        name: roomName ?? 'Untitled room',
         members: ['user-b7c2'],
         attendees: [],
         lastMessage: {},
