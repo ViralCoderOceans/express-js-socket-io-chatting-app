@@ -3,43 +3,49 @@ const app = express();
 const http = require('http').Server(app);
 const { Server } = require('socket.io');
 const cors = require('cors');
+const { instrument } = require("@socket.io/admin-ui");
 
 app.use(cors());
 let rooms = [
   {
     id: 'test-room-1',
     name: 'Test Room 1',
-    members: ['user-b7c2'],
+    members: [],
     attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 }
+    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
+    typingUsers: []
   },
   {
     id: 'test-room-2',
     name: 'Test Room 2',
-    members: ['user-b7c2'],
+    members: [],
     attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 }
+    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
+    typingUsers: []
   },
   {
     id: 'test-room-3',
     name: 'Test Room 3',
-    members: ['user-b7c2'],
+    members: [],
     attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 }
+    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
+    typingUsers: []
   },
   {
     id: 'test-room-4',
     name: 'Test Room 4',
     members: ['user-b7c2'],
     attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 }
+    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
+    typingUsers: []
   },
   {
     id: 'test-room-5',
     name: 'Test Room 5',
-    members: ['user-b7c2'],
+    members: [],
     attendees: [],
-    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 }
+    lastMessage: { username: "Test User 2", message: "Hii", time: 1706767172000 },
+    typingUsers: []
   },
   {
     id: '12',
@@ -48,9 +54,10 @@ let rooms = [
     attendees: [],
     lastMessage: {
       username: "user-b7c2",
-      message: "fretert",
+      message: "Hello, Good Morning!",
       time: 1706779110541
-    }
+    },
+    typingUsers: []
   }
 ];
 let messages = [
@@ -313,8 +320,14 @@ const server = http.listen(3003, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: ["http://localhost:3000", "https://admin.socket.io", "https://next-js-socket-io-chatting-app.vercel.app/"],
+    credentials: true
   },
+});
+
+instrument(io, {
+  auth: false,
+  mode: "development",
 });
 
 io.on('connection', (socket) => {
@@ -341,7 +354,8 @@ io.on('connection', (socket) => {
         name: roomName,
         members: ['user-b7c2'],
         attendees: [],
-        lastMessage: {}
+        lastMessage: {},
+        typingUsers: []
       })
       messages.push({
         roomId,
@@ -363,6 +377,53 @@ io.on('connection', (socket) => {
         return room
       })
     }
+  });
+
+  socket.on('unsubscribeRoom', (roomId, username) => {
+    if (username) {
+      rooms = rooms.map((room) => {
+        if (room.id === roomId) {
+          room.attendees.splice(room.attendees.indexOf(username), 1)
+          return room
+        }
+        return room
+      })
+    }
+    if (username) {
+      console.log('unsubscribeRoom: ', roomId, username)
+      rooms = rooms.map((room) => {
+        if (room.id === roomId) {
+          room.members.splice(room.members.indexOf(username), 1)
+          return room
+        }
+        return room
+      })
+    }
+    io.to(roomId).emit('userUnsubscribe', 'You have been successfully leaved the room', rooms);
+  });
+
+  socket.on('onTying', (isTyping, roomId, username) => {
+    if (username) {
+      if (isTyping) {
+        rooms = rooms.map((room) => {
+          if ((room.id === roomId) && (room.typingUsers.indexOf(username) <= -1)) {
+            room.typingUsers.push(username)
+            return room
+          }
+          return room
+        })
+      } else {
+        rooms = rooms.map((room) => {
+          if ((room.id === roomId) && (room.typingUsers.indexOf(username) > -1)) {
+            room.typingUsers.splice(room.typingUsers.indexOf(username), 1)
+            return room
+          }
+          return room
+        })
+      }
+    }
+    console.log('rooms: ', isTyping, '-->>', roomId, rooms.filter(room => room.id === roomId))
+    io.to(roomId).emit('userTying', rooms);
   });
 
   // Handle chat message event
